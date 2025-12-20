@@ -1,9 +1,12 @@
 package hello.springblog.service;
 
 import hello.springblog.domain.Article;
+import hello.springblog.domain.Comment;
 import hello.springblog.dto.AddArticleRequest;
+import hello.springblog.dto.AddCommentRequest;
 import hello.springblog.dto.UpdateArticleRequest;
 import hello.springblog.repository.BlogRepository;
+import hello.springblog.repository.CommentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +19,7 @@ import java.util.List;
 public class BlogService {
 
     private final BlogRepository blogRepository;
+    private final CommentRepository commentRepository;
 
     public Article save(AddArticleRequest request, String userName) {
         return blogRepository.save(request.toEntity(userName));
@@ -56,4 +60,13 @@ public class BlogService {
             throw new IllegalArgumentException("not authorized");
         }
     }
+
+    // 댓글 추가
+    public Comment addComment(AddCommentRequest request, String userName) {
+        Article article = blogRepository.findById(request.getArticleId())
+                .orElseThrow(()-> new IllegalArgumentException("not found:" + request.getArticleId()));
+
+        return commentRepository.save(request.toEntity(userName, article));
+    }
+
 }

@@ -1,9 +1,8 @@
 package hello.springblog.controller;
 
 import hello.springblog.domain.Article;
-import hello.springblog.dto.AddArticleRequest;
-import hello.springblog.dto.ArticleResponse;
-import hello.springblog.dto.UpdateArticleRequest;
+import hello.springblog.domain.Comment;
+import hello.springblog.dto.*;
 import hello.springblog.service.BlogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,5 +53,12 @@ public class BlogController {
         Article updatedArticle = blogService.update(id, request);
 
         return ResponseEntity.ok().body(updatedArticle);
+    }
+
+    @PostMapping("/api/comments")
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
+        Comment savedComment = blogService.addComment(request, principal.getName());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AddCommentResponse(savedComment));
     }
 }

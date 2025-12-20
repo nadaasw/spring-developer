@@ -2,10 +2,13 @@ package hello.springblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.springblog.domain.Article;
+import hello.springblog.domain.Comment;
 import hello.springblog.domain.User;
 import hello.springblog.dto.AddArticleRequest;
+import hello.springblog.dto.AddCommentRequest;
 import hello.springblog.dto.UpdateArticleRequest;
 import hello.springblog.repository.BlogRepository;
+import hello.springblog.repository.CommentRepository;
 import hello.springblog.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,12 +56,17 @@ class BlogControllerTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    CommentRepository commentRepository;
+
+
     User user;
 
     @BeforeEach
     public void mockMvcSetUp(){
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
         blogRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @BeforeEach
@@ -196,5 +204,38 @@ class BlogControllerTest {
                 .author(user.getUsername())
                 .content("content")
                 .build());
+    }
+
+
+    @DisplayName("addComment: 댓글 추가에 성공한다.")
+    @Test
+    public void addComment() throws Exception {
+        // given
+        final String url = "/api/comments";
+
+        Article savedArticle = createDefaultArticle();
+        final Long articleId = savedArticle.getId();
+        final String content = "content";
+        final AddCommentRequest addCommentRequest = new AddCommentRequest(articleId, content);
+
+        final String requestBody = objectMapper.writeValueAsString(addCommentRequest);
+        Principal principal = Mockito.mock(Principal.class);
+        Mockito.when(principal.getName()).thenReturn("username");
+
+        // when
+        ResultActions result = mockMvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .principal(principal)
+                .content(requestBody));
+
+
+        // then
+        result.andExpect(status().isCreated());
+
+        List<Comment> comments = commentRepository.findAll();
+
+        assertThat(comments.size()).isEqualTo(1);
+        assertThat(comments.get(0).getArticle().getId()).isEqualTo(articleId);
+        assertThat(comments.get(0).getContent()).isEqualTo(content);
     }
 }
