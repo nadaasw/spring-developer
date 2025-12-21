@@ -141,6 +141,6 @@ if(commentCreateButton){
             location.replace('/articles/' + articleId);
         };
 
-        httpRequest('POST', '/api/articles', body, success, fail)
+        httpRequest('POST', '/api/comments', body, success, fail)
     });
 }
