@@ -134,11 +134,11 @@ if(commentCreateButton){
 
         function success(){
             alert('등록 완료되었습니다.');
-            location.replace('/articles' + articleId);
+            location.replace('/articles/' + articleId);
         };
         function fail(){
             alert('등록 실패했습니다.');
-            location.replace('articles' + articleId);
+            location.replace('/articles/' + articleId);
         };
 
         httpRequest('POST', '/api/articles', body, success, fail)
