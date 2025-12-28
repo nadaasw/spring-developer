@@ -14,4 +14,10 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected refresh token"));
     }
+
+    public void deleteByRefreshToken(String refreshToken){
+        RefreshToken token = refreshTokenRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Unexpected refresh token"));
+        refreshTokenRepository.delete(token);
+    }
 }

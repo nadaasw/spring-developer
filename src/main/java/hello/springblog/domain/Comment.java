@@ -41,4 +41,8 @@ public class Comment {
         this.content = content;
         this.article = article;
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

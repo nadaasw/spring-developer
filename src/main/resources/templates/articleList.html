@@ -23,12 +23,13 @@
             <div class="card-body">
                 <h5 class="card-title" th:text="${item.title}"></h5>
                 <p class="card-text" th:text="${item.content}"></p>
+                <p class="card-text" th:text="|좋아요 수:${item.likeCount}|"></p>
                 <a th:href="@{/articles/{id}(id=${item.id})}" class="btn btn-primary">보러 가기</a>
             </div>
         </div>
     </div>
 
-    <button type="button" class="btn btn-secondary" onclick="location.href='/logout'">로그아웃</button>
+    <button type="button" id="logout-btn" class="btn btn-secondary">로그아웃</button>
 </div>
 <script src="/js/token.js"></script>
 <script src="/js/article.js"></script>

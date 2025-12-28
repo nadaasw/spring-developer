@@ -4,7 +4,9 @@ import hello.springblog.domain.Article;
 import hello.springblog.dto.ArticleListViewResponse;
 import hello.springblog.dto.ArticleViewResponse;
 import hello.springblog.service.BlogService;
+import hello.springblog.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import java.util.List;
 @Controller
 public class BlogViewController {
     private final BlogService blogService;
+    private final UserService userService;
 
     @GetMapping("/articles")
     public String getArticles(Model model) {
@@ -30,10 +33,23 @@ public class BlogViewController {
     }
 
     @GetMapping("/articles/{id}")
-    public String getArticle(@PathVariable("id") Long id, Model model) {
-        ArticleViewResponse article = new ArticleViewResponse(blogService.findById(id));
+    public String getArticle(@PathVariable("id") Long id, Authentication authentication, Model model) {
+        Long userId = null;
 
-        model.addAttribute("article", article);
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();
+            userId = userService.findByEmail(email).getId();
+        }
+
+        Article article = blogService.findById(id);
+
+        boolean likedByUser = (userId != null)
+                && blogService.hasLikeByUser(userId, id);
+
+        ArticleViewResponse response =
+                new ArticleViewResponse(article, likedByUser);
+
+        model.addAttribute("article", response);
 
         return "article";
     }
@@ -45,7 +61,7 @@ public class BlogViewController {
             model.addAttribute("article", new ArticleViewResponse());
         }else{
             Article article = blogService.findById(id);
-            model.addAttribute("article", new ArticleViewResponse(article));
+            model.addAttribute("article", new ArticleViewResponse(article, false));
         }
 
         return "newArticle";

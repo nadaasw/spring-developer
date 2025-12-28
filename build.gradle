@@ -38,6 +38,8 @@ dependencies {
 
     implementation 'com.mysql:mysql-connector-j'
 
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
     runtimeOnly 'com.h2database:h2'
 
     compileOnly 'org.projectlombok:lombok'

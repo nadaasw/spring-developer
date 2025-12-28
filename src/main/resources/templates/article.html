@@ -18,8 +18,15 @@
                 <input type="hidden" id="article-id" th:value="${article.id}">
                 <header class="mb-4">
                     <h1 class="fw-bolder mb-1" th:text="${article.title}"></h1>
-                    <div class="text-muted fst-italic mb-2" th:text="|Posted on ${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}
-                    BY ${article.author}|"></div>
+                    <div class="text-muted fst-italic mb-2"
+                         th:text="|${
+                                        article.updatedAt != null ? 'Updated on ' : 'Posted on '
+                                  }${
+                                    article.updatedAt != null
+                                    ? #temporals.format(article.updatedAt, 'yyyy-MM-dd HH:mm')
+                                    : #temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')
+                                 } BY ${article.author}|">
+                    </div>
                 </header>
                 <section class="mb-5">
                     <p class="fs-5 mb-4" th:text="${article.content}"></p>
@@ -27,6 +34,16 @@
                 <button type="button" id="modify-btn" th:onclick="|location.href='@{/new-article?id={articleId}(articleId=${article.id})}'|" class="btn btn-primary btn-sm">수정</button>
                 <button type="button" id="delete-btn" class="btn btn-secondary btn-sm">삭제</button>
             </article>
+            <div class="d-flex align-items-center gap-2 mt-3">
+                <!-- 좋아요 버튼 -->
+                <button type="button"
+                        id="like-btn"
+                        class="btn btn-sm"
+                        th:classappend="${article.likeByUser} ? ' btn-primary' : ' btn-outline-primary'"
+                        th:attr="data-liked=${article.likeByUser}">
+                    👍 Like <span id="like-count" th:text="${article.likeCount}">0</span>
+                </button>
+            </div>
 
             <hr class="mt-5">
 
@@ -45,11 +62,19 @@
             </section>
 
             <section class="mb-3" th:each="comment: ${article.comments}">
-                <div class="card mb-1">
+                <div class="card mb-1 comment-card">
+
                     <div class="card-body">
+                        <!-- ✅ 댓글 id는 중복 id가 아니라 class로 -->
+                        <input type="hidden" class="comment-id" th:value="${comment.id}">
+
                         <div class="text-muted fst-italic mb-2"
                              th:text="|Commented on ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')} By ${comment.author}|"></div>
-                        <p class="card-text" th:text="${comment.content}"></p>
+
+                        <!-- ✅ 버튼도 id 말고 class로 -->
+                        <button type="button" class="btn btn-outline-primary btn-sm comment-modify-btn">수정</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm comment-delete-btn">삭제</button>
+                        <p class="card-text comment-content" th:text="${comment.content}"></p>
                     </div>
                 </div>
             </section>

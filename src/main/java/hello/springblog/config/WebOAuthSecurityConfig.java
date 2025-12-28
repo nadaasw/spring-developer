@@ -1,6 +1,7 @@
 package hello.springblog.config;
 
 import hello.springblog.config.jwt.TokenProvider;
+import hello.springblog.config.oauth.FormLoginSuccessHanlder;
 import hello.springblog.config.oauth.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import hello.springblog.config.oauth.OAuth2SuccessHandler;
 import hello.springblog.config.oauth.OAuth2UserCustomService;
@@ -44,7 +45,10 @@ public class WebOAuthSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .successHandler(formLoginSuccessHandler()) // ⭐ 핵심
+                )
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -76,6 +80,12 @@ public class WebOAuthSecurityConfig {
                 userService);
     }
 
+    @Bean
+    public FormLoginSuccessHanlder formLoginSuccessHandler(){
+        return new FormLoginSuccessHanlder(tokenProvider,
+                userService,
+                refreshTokenRepository);
+    }
 
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {

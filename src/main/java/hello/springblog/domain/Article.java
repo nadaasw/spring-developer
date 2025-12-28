@@ -41,7 +41,12 @@ public class Article {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    @OrderBy("createdAt DESC")
     private List<Comment> comments;
+
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE)
+    private List<Like> likes;
 
     @Builder
     public Article(String title, String content, String author) {
@@ -54,4 +59,5 @@ public class Article {
         this.title = title;
         this.content = content;
     }
+
 }
